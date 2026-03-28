@@ -85,18 +85,24 @@ app.use((req,res,next) => {
     next();
 })
 
+// Home Route
+app.get("/", (req,res) => {
+    res.redirect("/listings");
+});
+
 app.use("/listings" , listingRouter);
 app.use("/listings/:id/reviews" , reviewRouter);
 app.use("/" , userRouter);
 
+// 404 handler - should be after all other routes
 app.all("*" , (req,res,next)=>{
     next(new ExpressError(404,"Page not found"));
-})
+});
 
+// Error handling middleware - must be last
 app.use((err,req,res,next)=>{
-    let {statusCode , message} = err;
-    res.render("error.ejs" , {err});
-    
+    let {statusCode = 500 , message = "Something went wrong"} = err;
+    res.status(statusCode).render("error.ejs" , {err});
 })
 
 app.listen(4040,(req,res)=>{
